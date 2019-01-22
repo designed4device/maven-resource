@@ -25,8 +25,7 @@ if [ "$debug" = "true" ]; then
   set -x
 fi
 
-release_url=$(jq -r '.source.url //empty' < $payload)
-snapshot_url=$(jq -r '.source.snapshot_url //empty' < $payload)
+url=$(jq -r '.source.url //empty' < $payload)
 artifact=$(jq -r '.source.artifact //empty' < $payload)
 version=$(jq -r '.version.version //empty' < $payload)
 username=$(jq -r '.source.username //empty' < $payload)
@@ -35,7 +34,7 @@ skip_cert_check=$(jq -r '.source.skip_cert_check //empty' < $payload)
 repository_cert=$(jq -r '.source.repository_cert //empty' < $payload)
 
 # TODO: Add more error checking
-if [ -z "$release_url" ] && [ -z "$snapshot_url" ] ; then
+if [ -z "$url" ] ; then
   printf '\e[91m[ERROR]\e[0m invalid payload (must specify url)\n'
   exit 1
 fi
@@ -64,9 +63,7 @@ if [ -n "$uniqueVersion" ]; then
   version=$(echo ${version%-$uniqueVersion}-SNAPSHOT)
 fi
 
-url=$release_url
 if [[ "$version" = *-SNAPSHOT ]]; then
-  [ -n "$snapshot_url" ] && url=$snapshot_url
   metadataUrl="$url/${groupId//.//}/$artifactId/$version/maven-metadata.xml"
 else
   metadataUrl="$url/${groupId//.//}/$artifactId/maven-metadata.xml"
@@ -83,7 +80,7 @@ set -e
 
 declare -a versions=( )
 if [[ "$version" = *-SNAPSHOT ]]; then
-  if [[ -z "$classifier" ]]; then 
+  if [[ -z "$classifier" ]]; then
     versions[1]=$(echo $metadata | xmllint --xpath "/metadata/versioning/snapshotVersions/snapshotVersion[extension='$packaging' and not(classifier)]/value/text()" - 2>/dev/null)
   else
     versions[1]=$(echo $metadata | xmllint --xpath "/metadata/versioning/snapshotVersions/snapshotVersion[extension='$packaging' and classifier='$classifier']/value/text()" - 2>/dev/null)

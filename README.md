@@ -11,15 +11,13 @@ Deploys and retrieve artifacts from a Maven Repository Manager.
 
 * `url`: *Required.* The location of the repository.
 
-* `snapshot_url`: *Optional.* The location of the snapshot repository.
-
 * `artifact`: *Required.* The artifact coordinates in the form of _groupId:artifactId:type[:classifier]_
 
 * `username`: *Optional.* Username for accessing an authenticated repository.
 
 * `password`: *Optional.* Password for accessing an authenticated repository.
 
-* `disable_redeploy`: *Optional.* If set to `true`, will not re-deploy a release if the artifact version has been previously deployed. NOTE: has no effect for -SNAPSHOT versions or `snapshot_url`.
+* `disable_redeploy`: *Optional.* If set to `true`, will not re-deploy a release if the artifact version has been previously deployed. NOTE: has no effect for -SNAPSHOT versions.
 
 * `skip_cert_check`: *Optional.* If set to `true`, will ignore all certificate errors when accessing an SSL repository. NOTE: this will supersede the `repository_cert` configuration if also specified.
 
@@ -77,7 +75,6 @@ resources:
   type: maven-resource
   source:
     url: https://myrepo.example.com/repository/maven-releases/
-    snapshot_url: https://myrepo.example.com/repository/maven-snapshots/
     artifact: com.example:example-webapp:jar
     username: myuser
     password: mypass
