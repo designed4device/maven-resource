@@ -16,6 +16,15 @@ resources:
       username: admin
       password: admin123
 
+  - name: release
+    type: maven-resource
+    source:
+      url: http://nexus:8081/repository/maven-releases/
+      artifact: net.designed4device:kotlin-idioms:jar
+      skip_cert_check: true
+      username: admin
+      password: admin123
+
   - name: git
     type: git
     source:
@@ -27,8 +36,6 @@ jobs:
     plan:
       - get: git
       - task: build
-        params:
-          PROFILE: concourse
         config:
           platform: linux
           image_resource:
@@ -56,3 +63,28 @@ jobs:
         params:
           file: jar/*.jar
           version_file: snapshot-version/version
+
+  - name: put release
+    plan:
+      - get: snapshot
+        passed:
+          - put snapshot
+      - task: version
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: alpine
+          outputs:
+            - name: version
+          run:
+            path: /bin/sh
+            args:
+              - -exc
+              - |
+                echo 1.0.2 > version/version
+      - put: release
+        params:
+          file: snapshot/*.jar
+          version_file: version/version

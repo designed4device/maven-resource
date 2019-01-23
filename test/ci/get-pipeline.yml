@@ -16,8 +16,22 @@ resources:
       username: admin
       password: admin123
 
+  - name: release
+    type: maven-resource
+    source:
+      url: http://nexus:8081/repository/maven-releases/
+      artifact: net.designed4device:kotlin-idioms:jar
+      skip_cert_check: true
+      username: admin
+      password: admin123
+
 jobs:
   - name: get snapshot
     plan:
       - get: snapshot
+        trigger: true
+
+  - name: get release
+    plan:
+      - get: release
         trigger: true
